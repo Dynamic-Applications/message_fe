@@ -59,28 +59,28 @@ export default function CreateChat() {
             alert("Please select at least one user.");
         }
     }
-    const showChat = (chatsSnap) => {
-        const chatId = chatsSnap.docs[0].id;
-        const chatData = chatsSnap.docs[0].data();
-        console.log("Chat ID:", chatId);
-        console.log("Chat Data:", chatData);
-    }
-    const isExistingChat = (chatsSnap) => {
-        return chatsSnap.docs.some((doc) => {
-            const chatData = doc.data();
-            const isUserInChat = chatData.users.some((userId) => userId === user.uid);
-            return isUserInChat;
-        });
-    }
-    const addNewPrivateChat = (userData) => {
-        const privateChatData = {
-            members: [user.uid, userData.id],
-            type: 1,
-        };
-        // Add logic to create a new private chat with the selected user
-        console.log("Private chat data:", privateChatData);
-        closeUsersModal();
-    }
+    // const showChat = (chatsSnap) => {
+    //     const chatId = chatsSnap.docs[0].id;
+    //     const chatData = chatsSnap.docs[0].data();
+    //     console.log("Chat ID:", chatId);
+    //     console.log("Chat Data:", chatData);
+    // }
+    // const isExistingChat = (chatsSnap) => {
+    //     return chatsSnap.docs.some((doc) => {
+    //         const chatData = doc.data();
+    //         const isUserInChat = chatData.users.some((userId) => userId === user.uid);
+    //         return isUserInChat;
+    //     });
+    // }
+    // const addNewPrivateChat = (userData) => {
+    //     const privateChatData = {
+    //         members: [user.uid, userData.id],
+    //         type: 1,
+    //     };
+    //     // Add logic to create a new private chat with the selected user
+    //     console.log("Private chat data:", privateChatData);
+    //     closeUsersModal();
+    // }
     const addNewGroupChat = (groupName) => {
         const groupChatData = {
             members: [user.uid, ...selectedUsers.map((user) => user.id)],
