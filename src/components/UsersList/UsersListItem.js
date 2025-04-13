@@ -1,4 +1,4 @@
-import { act, useState } from "react";
+import { useState } from "react";
 import { Avatar, ListItem, ListItemAvatar, ListItemText } from "@mui/material";
 
 export default function UsersListItem({ userData, userDataClickHandler }) {
