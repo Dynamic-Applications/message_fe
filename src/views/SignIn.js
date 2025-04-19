@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 
-const API_URL = process.env.REACT_APP_FILMFAVES_API;
+const API_URL = process.env.REACT_APP_MESSAGE_API;
 
 export default function SignIn() {
     const [showEmailForm, setShowEmailForm] = useState(false);

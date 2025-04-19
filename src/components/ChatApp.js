@@ -1,28 +1,41 @@
-import React, { useEffect, useState, useRef } from "react";
-import { io } from "socket.io-client";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
     Box,
     Typography,
+    Button, // Use a button for sign-out
     TextField,
     IconButton,
     Paper,
     Stack,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
+import { io } from "socket.io-client";
 
+// Retrieve token from localStorage
 const token = localStorage.getItem("token");
 
-const socket = io("http://localhost:4500", {
+const API_URL = process.env.REACT_APP_MESSAGE_API;
+
+
+const socket = io(`${API_URL}` || "http://localhost:4500", {
     auth: { token },
 });
 
 const ChatApp = () => {
-    const [message, setMessage] = useState("");
-    const [messages, setMessages] = useState([]);
-    const [activity, setActivity] = useState("");
-    const messagesEndRef = useRef(null);
+    const navigate = useNavigate(); // Hook for navigation
+    const [message, setMessage] = React.useState("");
+    const [messages, setMessages] = React.useState([]);
+    const [activity, setActivity] = React.useState("");
+    const messagesEndRef = React.useRef(null);
 
-    useEffect(() => {
+    // Sign out function
+    const handleSignOut = () => {
+        localStorage.removeItem("token"); // Remove the token from localStorage
+        navigate("/signin"); // Redirect to SignIn page
+    };
+
+    React.useEffect(() => {
         socket.on("message", (msg) => {
             setMessages((prev) => [...prev, msg]);
         });
@@ -40,7 +53,7 @@ const ChatApp = () => {
         };
     }, []);
 
-    useEffect(() => {
+    React.useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
@@ -76,6 +89,15 @@ const ChatApp = () => {
                     Message App
                 </Typography>
 
+                <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={handleSignOut}
+                    sx={{ marginBottom: 2, display: "block", margin: "0 auto" }}
+                >
+                    Sign Out
+                </Button>
+
                 <Box
                     sx={{
                         height: 300,
@@ -85,54 +107,40 @@ const ChatApp = () => {
                         p: 1,
                         mb: 2,
                         bgcolor: "#fafafa",
+                        mt: 2,
                     }}
                 >
                     <Stack spacing={1}>
-                        {messages.map((msg, idx) => {
-                            const isObject =
-                                typeof msg === "object" && msg !== null;
-                            const key = isObject
-                                ? msg.id
-                                : `${idx}-${msg.created_at || Date.now()}`;
-
-                            const username = isObject ? msg.username : null; // Don't set fallback to "Anonymous"
-                            const text = isObject ? msg.text : msg;
-                            const timestamp = isObject ? msg.created_at : null;
-
-                            return (
-                                <Box
-                                    key={key}
-                                    sx={{
-                                        bgcolor: "#e0f7fa",
-                                        px: 1.5,
-                                        py: 0.5,
-                                        borderRadius: 1,
-                                    }}
+                        {messages.map((msg, idx) => (
+                            <Box
+                                key={msg.id || idx}
+                                sx={{
+                                    bgcolor: "#e0f7fa",
+                                    px: 1.5,
+                                    py: 0.5,
+                                    borderRadius: 1,
+                                }}
+                            >
+                                <Typography
+                                    variant="body2"
+                                    sx={{ fontWeight: "bold" }}
                                 >
-                                    {username && (
-                                        <Typography
-                                            variant="body2"
-                                            sx={{ fontWeight: "bold" }}
-                                        >
-                                            {username}:
-                                        </Typography>
-                                    )}
-                                    <Typography variant="body2">
-                                        {text}
-                                    </Typography>
-                                    {timestamp && (
-                                        <Typography
-                                            variant="caption"
-                                            color="text.secondary"
-                                        >
-                                            {new Date(
-                                                timestamp
-                                            ).toLocaleString()}
-                                        </Typography>
-                                    )}
-                                </Box>
-                            );
-                        })}
+                                    {msg.username}
+                                </Typography>
+                                <Typography variant="body2">
+                                    {msg.text || msg}
+                                </Typography>
+                                <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                >
+                                    {msg.created_at &&
+                                        new Date(
+                                            msg.created_at
+                                        ).toLocaleString()}
+                                </Typography>
+                            </Box>
+                        ))}
                         <div ref={messagesEndRef} />
                     </Stack>
                 </Box>
