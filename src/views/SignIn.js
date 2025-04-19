@@ -1,19 +1,60 @@
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+    Box,
+    Button,
+    CircularProgress,
+    InputLabel,
+    OutlinedInput,
+    Typography,
+    Collapse,
+} from "@mui/material";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
-import { Box, Button } from "@mui/material";
 
 export default function SignIn() {
+    const [showEmailForm, setShowEmailForm] = useState(false);
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const navigate = useNavigate();
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError(null);
+
+        try {
+            const response = await fetch(`http://localhost:4500/auth/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok)
+                throw new Error(data.message || "Failed to login.");
+
+            localStorage.setItem("token", data.token);
+            alert(data.message);
+            navigate("/");
+            window.location.reload();
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const googleSignIn = () => {
-        // Logic for Google Sign-In
         console.log("Google Sign-In");
     };
+
     const anonymousSignIn = () => {
-        // Logic for Anonymous Sign-In
         console.log("Anonymous Sign-In");
     };
-    const emailSignIn = () => {
-        // Logic for Email Sign-In
-        console.log("Email Sign-In");
-    };
+
     return (
         <Box
             alignItems="center"
@@ -30,44 +71,142 @@ export default function SignIn() {
                 flexDirection="column"
                 padding="3rem"
                 borderRadius="10px"
-                sx={{ boxShadow: 5, mx: "0.5rem" }}
+                sx={{
+                    boxShadow: 5,
+                    mx: "0.5rem",
+                    minWidth: "320px",
+                    maxWidth: "400px",
+                    width: "100%",
+                }}
             >
                 <Box
                     backgroundColor="secondary.main"
                     borderRadius="10px"
-                    mb="3rem"
+                    mb="2rem"
                     padding="0.75rem"
                 >
                     <ChatBubbleOutlineIcon
-                        sx={{ color: "#fff", fontSize: 100 }}
+                        sx={{ color: "#fff", fontSize: 80 }}
                     />
                 </Box>
-                <Button
-                    variant="contained"
-                    color="secondary"
-                    fullWidth
-                    onClick={() => googleSignIn()}
-                >
-                    Sign in with Google
-                </Button>
-                <Button
-                    variant="contained"
-                    color="secondary"
-                    fullWidth
-                    onClick={() => emailSignIn()}
-                    sx={{ mt: 2 }}
-                >
-                    Sign in with Email
-                </Button>
-                <Button
-                    variant="contained"
-                    color="secondary"
-                    fullWidth
-                    onClick={() => anonymousSignIn()}
-                    sx={{ mt: 2 }}
-                >
-                    Sign in as a guest
-                </Button>
+
+                {/* Sign-in options */}
+                {!showEmailForm && (
+                    <>
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            fullWidth
+                            onClick={() => setShowEmailForm(true)}
+                        >
+                            Sign in with Email
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            fullWidth
+                            onClick={googleSignIn}
+                            sx={{ mt: 2 }}
+                        >
+                            Sign in with Google
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            fullWidth
+                            onClick={anonymousSignIn}
+                            sx={{ mt: 2 }}
+                        >
+                            Sign in as a guest
+                        </Button>
+                    </>
+                )}
+
+                {/* Email form collapses in */}
+                <Collapse in={showEmailForm} sx={{ width: "100%" }}>
+                    <form
+                        style={{ width: "100%", marginTop: "1rem" }}
+                        onSubmit={handleSubmit}
+                    >
+                        <InputLabel htmlFor="username">Username</InputLabel>
+                        <OutlinedInput
+                            fullWidth
+                            id="username"
+                            name="username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            margin="dense"
+                            required
+                        />
+                        <Box
+                            display="flex"
+                            justifyContent="space-between"
+                            mt={2}
+                        >
+                            <InputLabel htmlFor="password">Password</InputLabel>
+                            <Link
+                                to="/passresets"
+                                style={{ fontSize: "0.8rem" }}
+                            >
+                                Forgot password?
+                            </Link>
+                        </Box>
+                        <OutlinedInput
+                            fullWidth
+                            id="password"
+                            name="password"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            margin="dense"
+                            required
+                        />
+
+                        {error && (
+                            <Typography color="error" mt={1} mb={1}>
+                                {error}
+                            </Typography>
+                        )}
+
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            color="secondary"
+                            fullWidth
+                            disabled={loading}
+                            sx={{ mt: 2 }}
+                        >
+                            {loading ? (
+                                <CircularProgress size={24} />
+                            ) : (
+                                "Sign In"
+                            )}
+                        </Button>
+
+                        <Button
+                            onClick={() => setShowEmailForm(false)}
+                            color="secondary"
+                            fullWidth
+                            sx={{ mt: 1 }}
+                        >
+                            Cancel
+                        </Button>
+                    </form>
+                </Collapse>
+
+                <Box mt={3}>
+                    <Typography variant="body2">
+                        First time?{" "}
+                        <Link to="/signup" style={{ color: "#1976d2" }}>
+                            Create an account
+                        </Link>
+                    </Typography>
+                    <Typography variant="body2" mt={1}>
+                        <Link to="/" style={{ color: "#1976d2" }}>
+                            Back to Homepage
+                        </Link>
+                    </Typography>
+                </Box>
             </Box>
         </Box>
     );
