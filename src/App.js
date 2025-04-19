@@ -4,6 +4,7 @@ import ChatApp from "./components/ChatApp";
 import SignIn from "./views/SignIn";
 import SignUp from "./views/Signup";
 import SignInGoogle from "./views/SignInGoogle";
+// import GoogleCallback from "./views/GoogleCallback";
 
 function App() {
     return (
@@ -13,10 +14,8 @@ function App() {
                 <Routes>
                     <Route path="/signin" element={<SignIn />} />
                     <Route path="/signup" element={<SignUp />} />
-                    <Route path="/auth/google" element={<SignInGoogle />} />
-
+                    <Route path="/auth/google/callback" element={<SignInGoogle />} />
                     <Route path="/" element={<ChatApp />} />
-
                     {/* <Route
                         path="/reset-password/:token"
                         element={<ResetPassword />}
