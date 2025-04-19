@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import ChatApp from "./components/ChatApp";
 import SignIn from "./views/SignIn";
+import SignUp from "./views/Signup";
 
 function App() {
     return (
@@ -10,6 +11,7 @@ function App() {
             <div className="App">
                 <Routes>
                     <Route path="/signin" element={<SignIn />} />
+                    <Route path="/signup" element={<SignUp />} />
                     <Route path="/" element={<ChatApp />} />
 
                     {/* <Route

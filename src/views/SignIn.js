@@ -56,9 +56,9 @@ export default function SignIn() {
         console.log("Google Sign-In");
     };
 
-    const anonymousSignIn = () => {
-        console.log("Anonymous Sign-In");
-    };
+    // const anonymousSignIn = () => {
+    //     console.log("Anonymous Sign-In");
+    // };
 
     return (
         <Box
@@ -115,7 +115,7 @@ export default function SignIn() {
                         >
                             Sign in with Google
                         </Button>
-                        <Button
+                        {/* <Button
                             variant="contained"
                             color="secondary"
                             fullWidth
@@ -123,7 +123,7 @@ export default function SignIn() {
                             sx={{ mt: 2 }}
                         >
                             Sign in as a guest
-                        </Button>
+                        </Button> */}
                     </>
                 )}
 
@@ -200,12 +200,14 @@ export default function SignIn() {
                 </Collapse>
 
                 <Box mt={3}>
-                    <Typography variant="body2">
-                        First time?{" "}
-                        <Link to="/signup" style={{ color: "#1976d2" }}>
-                            Create an account
-                        </Link>
-                    </Typography>
+                    {showEmailForm && (
+                        <Typography variant="body2">
+                            First time?{" "}
+                            <Link to="/signup" style={{ color: "#1976d2" }}>
+                                Create an account
+                            </Link>
+                        </Typography>
+                    )}
                     <Typography variant="body2" mt={1}>
                         <Link to="/" style={{ color: "#1976d2" }}>
                             Back to Homepage
