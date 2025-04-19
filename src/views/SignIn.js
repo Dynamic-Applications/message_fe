@@ -11,6 +11,8 @@ import {
 } from "@mui/material";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 
+const API_URL = process.env.REACT_APP_FILMFAVES_API;
+
 export default function SignIn() {
     const [showEmailForm, setShowEmailForm] = useState(false);
     const [username, setUsername] = useState("");
@@ -25,11 +27,14 @@ export default function SignIn() {
         setError(null);
 
         try {
-            const response = await fetch(`http://localhost:4500/auth/login`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, password }),
-            });
+            const response = await fetch(
+                `${API_URL}/auth/login` || `http://localhost:4500/auth/login`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password }),
+                }
+            );
 
             const data = await response.json();
 
