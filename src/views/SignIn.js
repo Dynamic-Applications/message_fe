@@ -53,8 +53,11 @@ export default function SignIn() {
     };
 
     const googleSignIn = () => {
-        console.log("Google Sign-In");
+        window.location.href = `${API_URL}/auth/google`;
+        window.location.href = "http://localhost:4500/auth/google";
     };
+
+    
 
     // const anonymousSignIn = () => {
     //     console.log("Anonymous Sign-In");
