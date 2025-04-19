@@ -28,7 +28,7 @@ export default function SignIn() {
 
         try {
             const response = await fetch(
-                `${API_URL}/auth/login` || `http://localhost:4500/auth/login`,
+                `${API_URL}/auth/login`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -54,6 +54,7 @@ export default function SignIn() {
 
     const googleSignIn = () => {
         window.location.href = `${API_URL}/auth/google`;
+        window.location.href = "http://localhost:4500/auth/google";
     };
 
     
