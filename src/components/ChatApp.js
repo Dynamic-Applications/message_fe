@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
     Box,
     Typography,
-    Button, // Use a button for sign-out
+    Button,
     TextField,
     IconButton,
     Paper,
@@ -14,25 +14,22 @@ import { io } from "socket.io-client";
 
 // Retrieve token from localStorage
 const token = localStorage.getItem("token");
-
 const API_URL = process.env.REACT_APP_MESSAGE_API;
-
 
 const socket = io(`${API_URL}` || "http://localhost:4500", {
     auth: { token },
 });
 
 const ChatApp = () => {
-    const navigate = useNavigate(); // Hook for navigation
+    const navigate = useNavigate();
     const [message, setMessage] = React.useState("");
     const [messages, setMessages] = React.useState([]);
     const [activity, setActivity] = React.useState("");
     const messagesEndRef = React.useRef(null);
 
-    // Sign out function
     const handleSignOut = () => {
-        localStorage.removeItem("token"); // Remove the token from localStorage
-        navigate("/signin"); // Redirect to SignIn page
+        localStorage.removeItem("token");
+        navigate("/signin");
     };
 
     React.useEffect(() => {
@@ -113,7 +110,7 @@ const ChatApp = () => {
                     <Stack spacing={1}>
                         {messages.map((msg, idx) => (
                             <Box
-                                key={msg.id || idx}
+                                key={`${msg.username}-${msg.created_at || idx}`}
                                 sx={{
                                     bgcolor: "#e0f7fa",
                                     px: 1.5,
@@ -130,15 +127,16 @@ const ChatApp = () => {
                                 <Typography variant="body2">
                                     {msg.text || msg}
                                 </Typography>
-                                <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                >
-                                    {msg.created_at &&
-                                        new Date(
+                                {msg.created_at && (
+                                    <Typography
+                                        variant="caption"
+                                        color="text.secondary"
+                                    >
+                                        {new Date(
                                             msg.created_at
                                         ).toLocaleString()}
-                                </Typography>
+                                    </Typography>
+                                )}
                             </Box>
                         ))}
                         <div ref={messagesEndRef} />
