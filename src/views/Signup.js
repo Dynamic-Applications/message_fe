@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 
-const API_URL = process.env.REACT_APP_MESSAGE_API;
+const API_URL = process.env.REACT_APP_MESSAGE_API || "http://localhost:4500";
 
 export default function SignUp() {
     const [formData, setFormData] = useState({
