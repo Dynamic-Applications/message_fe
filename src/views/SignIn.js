@@ -54,7 +54,7 @@ export default function SignIn() {
 
     const googleSignIn = () => {
         window.location.href = `${API_URL}/auth/google`;
-        window.location.href = "http://localhost:4500/auth/google";
+        // window.location.href = "http://localhost:4500/auth/google";
     };
 
     
