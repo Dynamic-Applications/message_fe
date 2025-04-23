@@ -12,11 +12,11 @@ export default function SignInGoogle() {
 
             if (token) {
                 localStorage.setItem("token", token);
-                navigate("/"); // Redirect to home or wherever you want
+                navigate("/home"); // Redirect to home or wherever you want
                 window.location.reload(); // Optional: refresh to reset state
             } else {
                 console.error("No token found in query params.");
-                navigate("/login");
+                navigate("/signin");
             }
         }, [location, navigate]);
 
