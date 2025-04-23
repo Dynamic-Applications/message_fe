@@ -21,16 +21,10 @@ const socket = io(`${API_URL}` || "http://localhost:4500", {
 });
 
 const ChatApp = () => {
-    const navigate = useNavigate();
     const [message, setMessage] = React.useState("");
     const [messages, setMessages] = React.useState([]);
     const [activity, setActivity] = React.useState("");
     const messagesEndRef = React.useRef(null);
-
-    const handleSignOut = () => {
-        localStorage.removeItem("token");
-        navigate("/");
-    };
 
     React.useEffect(() => {
         socket.on("message", (msg) => {
@@ -85,16 +79,6 @@ const ChatApp = () => {
                 >
                     Message App
                 </Typography>
-
-                <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={handleSignOut}
-                    sx={{ marginBottom: 2, display: "block", margin: "0 auto" }}
-                >
-                    Sign Out
-                </Button>
-
                 <Box
                     sx={{
                         height: 300,
