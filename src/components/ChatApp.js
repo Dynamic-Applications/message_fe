@@ -29,7 +29,7 @@ const ChatApp = () => {
 
     const handleSignOut = () => {
         localStorage.removeItem("token");
-        navigate("/signin");
+        navigate("/");
     };
 
     React.useEffect(() => {

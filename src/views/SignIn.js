@@ -43,7 +43,7 @@ export default function SignIn() {
 
             localStorage.setItem("token", data.token);
             alert(data.message);
-            navigate("/");
+            navigate("/home");
             window.location.reload();
         } catch (err) {
             setError(err.message);
@@ -55,12 +55,6 @@ export default function SignIn() {
     const googleSignIn = () => {
         window.location.href = `${API_URL}/auth/google`;
     };
-
-    
-
-    // const anonymousSignIn = () => {
-    //     console.log("Anonymous Sign-In");
-    // };
 
     return (
         <Box
@@ -117,15 +111,6 @@ export default function SignIn() {
                         >
                             Sign in with Google
                         </Button>
-                        {/* <Button
-                            variant="contained"
-                            color="secondary"
-                            fullWidth
-                            onClick={anonymousSignIn}
-                            sx={{ mt: 2 }}
-                        >
-                            Sign in as a guest
-                        </Button> */}
                     </>
                 )}
 
@@ -210,11 +195,11 @@ export default function SignIn() {
                             </Link>
                         </Typography>
                     )}
-                    <Typography variant="body2" mt={1}>
+                    {/* <Typography variant="body2" mt={1}>
                         <Link to="/" style={{ color: "#1976d2" }}>
                             Back to Homepage
                         </Link>
-                    </Typography>
+                    </Typography> */}
                 </Box>
             </Box>
         </Box>

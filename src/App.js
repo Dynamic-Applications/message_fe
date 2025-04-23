@@ -12,10 +12,10 @@ function App() {
             {/* <NavBar /> */}
             <div className="App">
                 <Routes>
-                    <Route path="/signin" element={<SignIn />} />
+                    <Route path="/" element={<SignIn />} />
                     <Route path="/signup" element={<SignUp />} />
                     <Route path="/auth/google/callback" element={<SignInGoogle />} />
-                    <Route path="/" element={<ChatApp />} />
+                    <Route path="/home" element={<ChatApp />} />
                     {/* <Route
                         path="/reset-password/:token"
                         element={<ResetPassword />}

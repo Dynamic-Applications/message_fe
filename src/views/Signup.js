@@ -163,15 +163,15 @@ export default function SignUp() {
                 <Box mt={3}>
                     <Typography variant="body2">
                         Already have an account?{" "}
-                        <Link to="/signin" style={{ color: "#1976d2" }}>
+                        <Link to="/" style={{ color: "#1976d2" }}>
                             Sign in
                         </Link>
                     </Typography>
-                    <Typography variant="body2" mt={1}>
+                    {/* <Typography variant="body2" mt={1}>
                         <Link to="/" style={{ color: "#1976d2" }}>
                             Back to Homepage
                         </Link>
-                    </Typography>
+                    </Typography> */}
                 </Box>
             </Box>
         </Box>
