@@ -10,7 +10,6 @@ import {
 import SendIcon from "@mui/icons-material/Send";
 import { io } from "socket.io-client";
 
-// Retrieve token from localStorage
 const token = localStorage.getItem("token");
 const API_URL = process.env.REACT_APP_MESSAGE_API;
 
@@ -25,6 +24,20 @@ const ChatApp = () => {
     const messagesEndRef = React.useRef(null);
 
     React.useEffect(() => {
+        const fetchMessages = async () => {
+            try {
+                const res = await fetch(`${API_URL}/messages`);
+                const data = await res.json();
+                setMessages(data);
+            } catch (err) {
+                console.error("Error fetching messages:", err);
+            }
+        };
+
+        fetchMessages();
+    }, []);
+
+    React.useEffect(() => {
         socket.on("message", (msg) => {
             setMessages((prev) => [...prev, msg]);
         });
@@ -32,7 +45,7 @@ const ChatApp = () => {
         socket.on("activity", (name) => {
             setActivity(name ? `${name} is typing...` : "");
             if (name) {
-                setTimeout(() => setActivity(""), 2000);
+                setTimeout(() => setActivity(""), 3500);
             }
         });
 
@@ -56,6 +69,29 @@ const ChatApp = () => {
     const handleTyping = () => {
         socket.emit("activity", "Someone");
     };
+
+    const getDateLabel = (dateStr) => {
+        const msgDate = new Date(dateStr);
+        const now = new Date();
+
+        const isToday = msgDate.toDateString() === now.toDateString();
+
+        const yesterday = new Date();
+        yesterday.setDate(now.getDate() - 1);
+
+        const isYesterday = msgDate.toDateString() === yesterday.toDateString();
+
+        if (isToday) return "Today";
+        if (isYesterday) return "Yesterday";
+        return msgDate.toDateString();
+    };
+
+    const groupedMessages = messages.reduce((groups, msg) => {
+        const label = getDateLabel(msg.created_at);
+        if (!groups[label]) groups[label] = [];
+        groups[label].push(msg);
+        return groups;
+    }, {});
 
     return (
         <Box
@@ -90,37 +126,56 @@ const ChatApp = () => {
                     }}
                 >
                     <Stack spacing={1}>
-                        {messages.map((msg, idx) => (
-                            <Box
-                                key={`${msg.username}-${msg.created_at || idx}`}
-                                sx={{
-                                    bgcolor: "#e0f7fa",
-                                    px: 1.5,
-                                    py: 0.5,
-                                    borderRadius: 1,
-                                }}
-                            >
-                                <Typography
-                                    variant="body2"
-                                    sx={{ fontWeight: "bold" }}
-                                >
-                                    {msg.username}
-                                </Typography>
-                                <Typography variant="body2">
-                                    {msg.text || msg}
-                                </Typography>
-                                {msg.created_at && (
-                                    <Typography
-                                        variant="caption"
-                                        color="text.secondary"
-                                    >
-                                        {new Date(
-                                            msg.created_at
-                                        ).toLocaleString()}
-                                    </Typography>
-                                )}
-                            </Box>
-                        ))}
+                        {Object.entries(groupedMessages).map(
+                            ([label, msgs]) => (
+                                <React.Fragment key={label}>
+                                    <Box sx={{ textAlign: "center", my: 1 }}>
+                                        <Typography
+                                            variant="caption"
+                                            fontWeight="bold"
+                                        >
+                                            {label}
+                                        </Typography>
+                                    </Box>
+                                    {msgs.map((msg, i) => (
+                                        <Box
+                                            key={`${msg.username}-${
+                                                msg.created_at || i
+                                            }`}
+                                            sx={{
+                                                bgcolor: "#e0f7fa",
+                                                px: 1.5,
+                                                py: 0.5,
+                                                borderRadius: 1,
+                                            }}
+                                        >
+                                            <Typography
+                                                variant="body2"
+                                                sx={{ fontWeight: "bold" }}
+                                            >
+                                                {msg.username}
+                                            </Typography>
+                                            <Typography variant="body2">
+                                                {msg.text || msg}
+                                            </Typography>
+                                            {msg.created_at && (
+                                                <Typography
+                                                    variant="caption"
+                                                    color="text.secondary"
+                                                >
+                                                    {new Date(
+                                                        msg.created_at
+                                                    ).toLocaleTimeString([], {
+                                                        hour: "2-digit",
+                                                        minute: "2-digit",
+                                                    })}
+                                                </Typography>
+                                            )}
+                                        </Box>
+                                    ))}
+                                </React.Fragment>
+                            )
+                        )}
                         <div ref={messagesEndRef} />
                     </Stack>
                 </Box>
