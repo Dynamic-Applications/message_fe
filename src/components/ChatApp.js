@@ -251,7 +251,7 @@ const ChatApp = () => {
     const [activity, setActivity] = React.useState("");
     const messagesEndRef = React.useRef(null);
 
-    const [showOptions, setShowOptions] = React.useState(false);
+    const [ setShowOptions] = React.useState(false);
     const [isEditing, setIsEditing] = React.useState(false);
     const [editText, setEditText] = React.useState("");
     
