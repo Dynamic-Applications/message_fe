@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
     Box,
     Typography,
@@ -8,31 +8,32 @@ import {
     Stack,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
+import LockIcon from "@mui/icons-material/Lock";
 import { io } from "socket.io-client";
-import { useSwipeable } from "react-swipeable";
+import SwipeToDelete from "./SwipeToDelete"; // Import your swipe component
 
 const token = localStorage.getItem("token");
 const currentUserId = localStorage.getItem("user_id");
-const API_URL = process.env.REACT_APP_MESSAGE_API;
+console.log("Current User ID:", currentUserId);
+console.log("Token:", token);
+const API_URL = process.env.REACT_APP_MESSAGE_API || "http://localhost:4500";
 
-const socket = io(`${API_URL}` || "http://localhost:4500", {
+const socket = io(`${API_URL}`, {
     auth: { token },
 });
 
 const ChatApp = () => {
-    const [message, setMessage] = React.useState("");
-    const [messages, setMessages] = React.useState([]);
-    const [activity, setActivity] = React.useState("");
-    const messagesEndRef = React.useRef(null);
+    const [message, setMessage] = useState("");
+    const [messages, setMessages] = useState([]);
+    const [activity, setActivity] = useState("");
+    const messagesEndRef = useRef(null);
 
-    const [isEditing, setIsEditing] = React.useState(false);
-    const [editText, setEditText] = React.useState("");
-    const [swipedMessageId, setSwipedMessageId] = React.useState(null);
-
-    React.useEffect(() => {
+    useEffect(() => {
         const fetchMessages = async () => {
             try {
-                const res = await fetch(`${API_URL}/messages`);
+                const res = await fetch(`${API_URL}/messages`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
                 const data = await res.json();
                 setMessages(data);
             } catch (err) {
@@ -43,7 +44,7 @@ const ChatApp = () => {
         fetchMessages();
     }, []);
 
-    React.useEffect(() => {
+    useEffect(() => {
         socket.on("message", (msg) => {
             setMessages((prev) => [...prev, msg]);
         });
@@ -61,7 +62,7 @@ const ChatApp = () => {
         };
     }, []);
 
-    React.useEffect(() => {
+    useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
@@ -88,7 +89,7 @@ const ChatApp = () => {
         }
     };
 
-    const handleEdit = async (id, newText) => {
+    const handleEdit = async (id, newMessage) => {
         try {
             const res = await fetch(`${API_URL}/messages/${id}`, {
                 method: "PUT",
@@ -96,11 +97,14 @@ const ChatApp = () => {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({ text: newText }),
+                body: JSON.stringify({ text: newMessage }),
             });
-            const updated = await res.json();
+
+            const updatedMessage = await res.json();
             setMessages((prev) =>
-                prev.map((msg) => (msg.id === id ? updated : msg))
+                prev.map((msg) =>
+                    msg.id === id ? { ...msg, text: updatedMessage.text } : msg
+                )
             );
         } catch (err) {
             console.error("Edit failed:", err);
@@ -110,15 +114,12 @@ const ChatApp = () => {
     const getDateLabel = (dateStr) => {
         const msgDate = new Date(dateStr);
         const now = new Date();
-
-        const isToday = msgDate.toDateString() === now.toDateString();
         const yesterday = new Date();
         yesterday.setDate(now.getDate() - 1);
 
-        const isYesterday = msgDate.toDateString() === yesterday.toDateString();
-
-        if (isToday) return "Today";
-        if (isYesterday) return "Yesterday";
+        if (msgDate.toDateString() === now.toDateString()) return "Today";
+        if (msgDate.toDateString() === yesterday.toDateString())
+            return "Yesterday";
         return msgDate.toDateString();
     };
 
@@ -128,17 +129,6 @@ const ChatApp = () => {
         groups[label].push(msg);
         return groups;
     }, {});
-
-    const swipeableHandlers = useSwipeable({
-        onSwipedLeft: (eventData) => {
-            setSwipedMessageId(eventData.id); // Keep track of swiped message ID
-        },
-        onSwipedRight: () => {
-            setSwipedMessageId(null); // Reset when swiped back
-        },
-        preventDefaultTouchmoveEvent: true,
-        trackMouse: true,
-    });
 
     return (
         <Box
@@ -172,7 +162,6 @@ const ChatApp = () => {
                         bgcolor: "#fafafa",
                         mt: 2,
                     }}
-                    {...swipeableHandlers}
                 >
                     <Stack spacing={0.5}>
                         {Object.entries(groupedMessages).map(
@@ -186,10 +175,12 @@ const ChatApp = () => {
                                             {label}
                                         </Typography>
                                     </Box>
+
                                     {msgs.map((msg) => {
                                         const isOwner =
                                             String(msg.user_id) ===
-                                            currentUserId;
+                                            String(currentUserId);
+
 
                                         return (
                                             <Box
@@ -205,109 +196,70 @@ const ChatApp = () => {
                                                         px: 0.75,
                                                         py: 0.25,
                                                         borderRadius: 1,
-                                                        position: "relative",
                                                     }}
                                                 >
-                                                    <Typography variant="body2">
-                                                        <span
-                                                            style={{
-                                                                fontWeight:
-                                                                    "bold",
-                                                            }}
-                                                        >
-                                                            {msg.username}
-                                                        </span>{" "}
-                                                        —{" "}
-                                                        {new Date(
-                                                            msg.created_at
-                                                        ).toLocaleTimeString(
-                                                            [],
-                                                            {
-                                                                hour: "2-digit",
-                                                                minute: "2-digit",
-                                                            }
-                                                        )}
-                                                    </Typography>
-
-                                                    {isEditing &&
-                                                    msg.id ===
-                                                        swipedMessageId ? (
-                                                        <TextField
-                                                            fullWidth
-                                                            size="small"
-                                                            value={editText}
-                                                            onChange={(e) =>
-                                                                setEditText(
-                                                                    e.target
-                                                                        .value
-                                                                )
-                                                            }
-                                                            onKeyDown={(e) => {
-                                                                if (
-                                                                    e.key ===
-                                                                    "Enter"
-                                                                ) {
-                                                                    handleEdit(
-                                                                        msg.id,
-                                                                        editText
-                                                                    );
-                                                                    setIsEditing(
-                                                                        false
-                                                                    );
-                                                                    setSwipedMessageId(
-                                                                        null
-                                                                    ); // Reset swipe
-                                                                }
-                                                            }}
-                                                        />
-                                                    ) : (
+                                                    <Box
+                                                        sx={{
+                                                            display: "flex",
+                                                            alignItems:
+                                                                "center",
+                                                            justifyContent:
+                                                                "space-between",
+                                                        }}
+                                                    >
                                                         <Typography variant="body2">
-                                                            {msg.text}
-                                                        </Typography>
-                                                    )}
-
-                                                    {isOwner &&
-                                                        swipedMessageId ===
-                                                            msg.id &&
-                                                        !isEditing && (
-                                                            <Box
-                                                                sx={{
-                                                                    position:
-                                                                        "absolute",
-                                                                    right: 0,
-                                                                    top: 0,
-                                                                    display:
-                                                                        "flex",
-                                                                    flexDirection:
-                                                                        "column",
-                                                                    bgcolor:
-                                                                        "#fff",
-                                                                    boxShadow: 2,
-                                                                    borderRadius: 1,
+                                                            <span
+                                                                style={{
+                                                                    fontWeight:
+                                                                        "bold",
                                                                 }}
                                                             >
-                                                                <IconButton
-                                                                    onClick={() =>
-                                                                        setIsEditing(
-                                                                            true
-                                                                        )
-                                                                    }
-                                                                    size="small"
-                                                                >
-                                                                    ✏️
-                                                                </IconButton>
-                                                                <IconButton
-                                                                    onClick={() =>
-                                                                        handleDelete(
-                                                                            msg.id
-                                                                        )
-                                                                    }
-                                                                    size="small"
-                                                                >
-                                                                    🗑️
-                                                                </IconButton>
-                                                            </Box>
+                                                                {msg.username}
+                                                            </span>{" "}
+                                                            —{" "}
+                                                            {new Date(
+                                                                msg.created_at
+                                                            ).toLocaleTimeString(
+                                                                [],
+                                                                {
+                                                                    hour: "2-digit",
+                                                                    minute: "2-digit",
+                                                                }
+                                                            )}
+                                                        </Typography>
+
+                                                        {isOwner ? (
+                                                            <SwipeToDelete
+                                                                messageId={
+                                                                    msg.id
+                                                                }
+                                                                messageText={
+                                                                    msg.text
+                                                                }
+                                                                onDelete={
+                                                                    handleDelete
+                                                                }
+                                                                onEdit={
+                                                                    handleEdit
+                                                                }
+                                                            />
+                                                        ) : (
+                                                            <LockIcon
+                                                                sx={{
+                                                                    fontSize: 16,
+                                                                    color: "grey.500",
+                                                                    ml: 1,
+                                                                }}
+                                                            />
                                                         )}
+                                                    </Box>
+
+                                                    <Typography
+                                                        variant="body2"
+                                                        sx={{ mt: 0.5 }}
+                                                    >
+                                                        {msg.text}
+                                                    </Typography>
                                                 </Box>
                                             </Box>
                                         );
@@ -361,3 +313,5 @@ const ChatApp = () => {
 };
 
 export default ChatApp;
+
+
