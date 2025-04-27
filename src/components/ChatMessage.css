@@ -1,0 +1,145 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+.message-container {
+    display: flex;
+    margin-bottom: 15px;
+    max-width: 70%;
+}
+
+.own-message {
+    margin-left: auto;
+}
+
+.other-message {
+    margin-right: auto;
+}
+
+.message-bubble {
+    padding: 12px 16px;
+    border-radius: 20px;
+    position: relative;
+}
+
+.own-bubble {
+    background-color: #007aff;
+    color: white;
+    border-bottom-right-radius: 5px;
+}
+
+.other-bubble {
+    background-color: #e5e5ea;
+    color: #333;
+    border-bottom-left-radius: 5px;
+}
+
+.message-text {
+    margin: 0;
+    word-wrap: break-word;
+    font-weight: 400;
+}
+
+.message-time {
+    font-size: 11px;
+    color: #666;
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+.messages-container {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+}
+
+.message {
+    display: flex;
+    margin-bottom: 16px;
+    font-family: "Poppins", sans-serif;
+}
+
+.message.own {
+    flex-direction: row-reverse;
+}
+
+.message-content {
+    max-width: 70%;
+    padding: 12px 16px;
+    border-radius: 16px;
+    position: relative;
+    font-size: 14px;
+    line-height: 1.5;
+    letter-spacing: 0.3px;
+}
+
+.message.own .message-content {
+    background-color: #007aff;
+    color: white;
+    border-bottom-right-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.message:not(.own) .message-content {
+    background-color: #f0f2f5;
+    color: #333;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.message.own .message-time {
+    color: rgba(255, 255, 255, 0.8);
+    text-align: right;
+}
+
+.message-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin: 0 8px;
+    object-fit: cover;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.message.own .message-text {
+    color: white;
+}
+
+.message:not(.own) .message-text {
+    color: #333;
+}
+
+/* Message animations */
+.message {
+    animation: messageAppear 0.3s ease-out;
+}
+
+@keyframes messageAppear {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive design */
+@media (max-width: 390px) {
+    .message-content {
+        max-width: 85%;
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+
+    .message-time {
+        font-size: 10px;
+    }
+
+    .message-avatar {
+        width: 28px;
+        height: 28px;
+    }
+}

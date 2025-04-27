@@ -10,13 +10,12 @@ import {
 import SendIcon from "@mui/icons-material/Send";
 import LockIcon from "@mui/icons-material/Lock";
 import { io } from "socket.io-client";
-import SwipeToDelete from "./SwipeToDelete"; // Import your swipe component
+import SwipeToDelete from "./SwipeToDelete";
 
 const token = localStorage.getItem("token");
 const currentUserId = localStorage.getItem("user_id");
-console.log("Current User ID:", currentUserId);
-console.log("Token:", token);
-const API_URL = process.env.REACT_APP_MESSAGE_API || "http://localhost:4500";
+const API_URL =
+    process.env.REACT_APP_MESSAGE_API || "https://messageapi-z2ao.onrender.com";
 
 const socket = io(`${API_URL}`, {
     auth: { token },
@@ -31,10 +30,19 @@ const ChatApp = () => {
     useEffect(() => {
         const fetchMessages = async () => {
             try {
-                const res = await fetch(`${API_URL}/messages`, {
-                    headers: { Authorization: `Bearer ${token}` },
+                const response = await fetch(`${API_URL}/messages`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
                 });
-                const data = await res.json();
+
+                if (!response.ok) {
+                    throw new Error("Failed to fetch messages");
+                }
+
+                const data = await response.json();
+                console.log("Fetched messages:", data);
                 setMessages(data);
             } catch (err) {
                 console.error("Error fetching messages:", err);
@@ -66,10 +74,28 @@ const ChatApp = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
-    const handleSend = () => {
+    const handleSend = async () => {
         if (message.trim()) {
-            socket.emit("message", message);
-            setMessage("");
+            try {
+                const response = await fetch(`${API_URL}/messages`, {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ text: message }),
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to send message");
+                }
+
+                const newMessage = await response.json();
+                socket.emit("message", newMessage);
+                setMessage("");
+            } catch (err) {
+                console.error("Error sending message:", err);
+            }
         }
     };
 
@@ -79,10 +105,18 @@ const ChatApp = () => {
 
     const handleDelete = async (id) => {
         try {
-            await fetch(`${API_URL}/messages/${id}`, {
+            const response = await fetch(`${API_URL}/messages/${id}`, {
                 method: "DELETE",
-                headers: { Authorization: `Bearer ${token}` },
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
             });
+
+            if (!response.ok) {
+                throw new Error("Failed to delete message");
+            }
+
             setMessages((prev) => prev.filter((msg) => msg.id !== id));
         } catch (err) {
             console.error("Delete failed:", err);
@@ -91,7 +125,7 @@ const ChatApp = () => {
 
     const handleEdit = async (id, newMessage) => {
         try {
-            const res = await fetch(`${API_URL}/messages/${id}`, {
+            const response = await fetch(`${API_URL}/messages/${id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -100,7 +134,11 @@ const ChatApp = () => {
                 body: JSON.stringify({ text: newMessage }),
             });
 
-            const updatedMessage = await res.json();
+            if (!response.ok) {
+                throw new Error("Failed to edit message");
+            }
+
+            const updatedMessage = await response.json();
             setMessages((prev) =>
                 prev.map((msg) =>
                     msg.id === id ? { ...msg, text: updatedMessage.text } : msg
@@ -131,187 +169,44 @@ const ChatApp = () => {
     }, {});
 
     return (
-        <Box
-            sx={{
-                minHeight: "100vh",
-                bgcolor: "#f0f2f5",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                p: 2,
-            }}
-        >
-            <Paper elevation={3} sx={{ width: "100%", maxWidth: 500, p: 3 }}>
-                <Typography
-                    variant="h5"
-                    fontWeight="bold"
-                    gutterBottom
-                    align="center"
-                >
-                    Message App
-                </Typography>
-
-                <Box
-                    sx={{
-                        height: 300,
-                        overflowY: "auto",
-                        border: "1px solid #ccc",
-                        borderRadius: 2,
-                        p: 1,
-                        mb: 2,
-                        bgcolor: "#fafafa",
-                        mt: 2,
-                    }}
-                >
-                    <Stack spacing={0.5}>
-                        {Object.entries(groupedMessages).map(
-                            ([label, msgs]) => (
-                                <React.Fragment key={label}>
-                                    <Box sx={{ textAlign: "center", my: 1 }}>
-                                        <Typography
-                                            variant="caption"
-                                            fontWeight="bold"
-                                        >
-                                            {label}
-                                        </Typography>
-                                    </Box>
-
-                                    {msgs.map((msg) => {
-                                        const isOwner =
-                                            String(msg.user_id) ===
-                                            String(currentUserId);
-
-
-                                        return (
-                                            <Box
-                                                key={msg.id}
-                                                sx={{
-                                                    position: "relative",
-                                                    py: 0.25,
-                                                }}
-                                            >
-                                                <Box
-                                                    sx={{
-                                                        bgcolor: "#e0f7fa",
-                                                        px: 0.75,
-                                                        py: 0.25,
-                                                        borderRadius: 1,
-                                                    }}
-                                                >
-                                                    <Box
-                                                        sx={{
-                                                            display: "flex",
-                                                            alignItems:
-                                                                "center",
-                                                            justifyContent:
-                                                                "space-between",
-                                                        }}
-                                                    >
-                                                        <Typography variant="body2">
-                                                            <span
-                                                                style={{
-                                                                    fontWeight:
-                                                                        "bold",
-                                                                }}
-                                                            >
-                                                                {msg.username}
-                                                            </span>{" "}
-                                                            —{" "}
-                                                            {new Date(
-                                                                msg.created_at
-                                                            ).toLocaleTimeString(
-                                                                [],
-                                                                {
-                                                                    hour: "2-digit",
-                                                                    minute: "2-digit",
-                                                                }
-                                                            )}
-                                                        </Typography>
-
-                                                        {isOwner ? (
-                                                            <SwipeToDelete
-                                                                messageId={
-                                                                    msg.id
-                                                                }
-                                                                messageText={
-                                                                    msg.text
-                                                                }
-                                                                onDelete={
-                                                                    handleDelete
-                                                                }
-                                                                onEdit={
-                                                                    handleEdit
-                                                                }
-                                                            />
-                                                        ) : (
-                                                            <LockIcon
-                                                                sx={{
-                                                                    fontSize: 16,
-                                                                    color: "grey.500",
-                                                                    ml: 1,
-                                                                }}
-                                                            />
-                                                        )}
-                                                    </Box>
-
-                                                    <Typography
-                                                        variant="body2"
-                                                        sx={{ mt: 0.5 }}
-                                                    >
-                                                        {msg.text}
-                                                    </Typography>
-                                                </Box>
-                                            </Box>
-                                        );
-                                    })}
-                                </React.Fragment>
-                            )
-                        )}
-                        <div ref={messagesEndRef} />
-                    </Stack>
-                </Box>
-
-                {activity && (
-                    <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        fontStyle="italic"
-                        mb={1}
-                    >
-                        {activity}
-                    </Typography>
-                )}
-
-                <Box sx={{ display: "flex", gap: 1 }}>
-                    <TextField
-                        fullWidth
-                        variant="outlined"
-                        placeholder="Type your message..."
-                        size="small"
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        onKeyDown={(e) => {
-                            handleTyping();
-                            if (e.key === "Enter") handleSend();
+        <div className="chat-container" style={{ padding: "20px" }}>
+            {Object.keys(groupedMessages).map((dateLabel) => (
+                <div key={dateLabel}>
+                    <h3>{dateLabel}</h3>
+                    <SwipeToDelete
+                        rows={groupedMessages[dateLabel].map((msg) => ({
+                            id: msg.id,
+                            title: msg.text,
+                        }))}
+                        onDelete={handleDelete}
+                        onEdit={(id) => {
+                            const newText = prompt("Edit your message:");
+                            if (newText) {
+                                handleEdit(id, newText);
+                            }
                         }}
                     />
-                    <IconButton
-                        color="primary"
-                        onClick={handleSend}
-                        sx={{
-                            bgcolor: "primary.main",
-                            color: "#fff",
-                            ":hover": { bgcolor: "primary.dark" },
-                        }}
-                    >
-                        <SendIcon />
-                    </IconButton>
-                </Box>
-            </Paper>
-        </Box>
+                </div>
+            ))}
+
+            <div style={{ marginTop: "20px" }}>
+                <input
+                    type="text"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    onKeyDown={handleTyping}
+                    placeholder="Type your message..."
+                    style={{ width: "80%", padding: "10px" }}
+                />
+                <button onClick={handleSend} style={{ padding: "10px" }}>
+                    Send
+                </button>
+                <div>{activity}</div>
+            </div>
+
+            <div ref={messagesEndRef} />
+        </div>
     );
 };
 
 export default ChatApp;
-
-

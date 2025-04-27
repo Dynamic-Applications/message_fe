@@ -1,0 +1,282 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+.calls-page {
+    height: 100vh;
+    background-color: #f5f5f5;
+    overflow-y: auto;
+    font-family: "Poppins", sans-serif;
+}
+
+.calls-header {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background-color: #fff;
+    border-bottom: 1px solid #e0e0e0;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.back-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px 10px;
+    margin-right: 10px;
+    color: #007aff;
+    font-weight: 600;
+    font-size: 24px;
+    transition: color 0.3s ease;
+}
+
+.back-button:hover {
+    color: #0056b3;
+}
+
+.calls-header h2 {
+    margin: 0;
+    font-size: 20px;
+    color: #333;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.calls-content {
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.call-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.call-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.tab-button {
+    padding: 8px 16px;
+    border: none;
+    background: none;
+    color: #666;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 20px;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+    letter-spacing: 0.3px;
+}
+
+.tab-button:hover {
+    background-color: #f0f2f5;
+    color: #007aff;
+}
+
+.tab-button.active {
+    background-color: #007aff;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.call-history {
+    background-color: #fff;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.call-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #e0e0e0;
+    transition: background-color 0.3s ease;
+}
+
+.call-item:hover {
+    background-color: #f8f9fa;
+}
+
+.call-item:last-child {
+    border-bottom: none;
+}
+
+.call-item img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 15px;
+    object-fit: cover;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.call-info {
+    flex: 1;
+}
+
+.call-info h4 {
+    margin: 0 0 5px;
+    font-size: 14px;
+    color: #333;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.call-details {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.call-type {
+    font-size: 12px;
+    color: #666;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+.call-type.outgoing {
+    color: #28a745;
+}
+
+.call-type.incoming {
+    color: #007aff;
+}
+
+.call-time {
+    font-size: 12px;
+    color: #666;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+.call-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.call-button,
+.video-call-button {
+    background: none;
+    border: none;
+    color: #007aff;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.call-button:hover,
+.video-call-button:hover {
+    background-color: #e3f2fd;
+    transform: scale(1.1);
+}
+
+.contacts-section {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.contacts-section h3 {
+    margin: 0 0 15px;
+    font-size: 16px;
+    color: #666;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.contact-item:hover {
+    background-color: #f8f9fa;
+    transform: translateX(5px);
+}
+
+.contact-item img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 15px;
+    object-fit: cover;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.contact-info {
+    flex: 1;
+}
+
+.contact-info h4 {
+    margin: 0 0 5px;
+    font-size: 14px;
+    color: #333;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.status {
+    font-size: 12px;
+    color: #666;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+.status.available {
+    color: #28a745;
+}
+
+.status.busy {
+    color: #dc3545;
+}
+
+.contact-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 390px) {
+    .calls-content {
+        padding: 15px;
+    }
+
+    .tab-button {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    .call-item img,
+    .contact-item img {
+        width: 35px;
+        height: 35px;
+    }
+
+    .call-info h4,
+    .contact-info h4 {
+        font-size: 13px;
+    }
+
+    .call-type,
+    .call-time,
+    .status {
+        font-size: 11px;
+    }
+}

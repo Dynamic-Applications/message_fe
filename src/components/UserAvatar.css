@@ -1,0 +1,26 @@
+.avatar-container {
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: #f0f0f0;
+}
+
+.avatar-container.small {
+    width: 32px;
+    height: 32px;
+}
+
+.avatar-container.medium {
+    width: 50px;
+    height: 50px;
+}
+
+.avatar-container.large {
+    width: 64px;
+    height: 64px;
+}
+
+.avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
