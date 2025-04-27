@@ -192,11 +192,35 @@ const Profile = () => {
         setIsEditing(false);
     };
 
-    const handleSignOut = () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user_id");
-        setIsAuthenticated(false);
-        navigate("/signin");
+    const handleSignOut = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            const response = await fetch(`${API_URL}/auth/logout`, {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (response.ok) {
+                // Clear local storage
+                localStorage.removeItem("token");
+                localStorage.removeItem("user_id");
+                setIsAuthenticated(false);
+                navigate("/");
+            } else {
+                console.error("Logout failed:", await response.text());
+            }
+        } catch (error) {
+            console.error("Error during logout:", error);
+            // Still clear local storage and redirect even if server request fails
+            localStorage.removeItem("token");
+            localStorage.removeItem("user_id");
+            setIsAuthenticated(false);
+            navigate("/");
+        }
     };
 
     const formatDate = (date) => {

@@ -81,13 +81,6 @@ export default function SignIn() {
         window.location.href = `${API_URL}/auth/google`;
     };
 
-    // const handleSignOut = () => {
-    //     localStorage.removeItem("token");
-    //     localStorage.removeItem("user_id");
-    //     setIsAuthenticated(false);
-    //     navigate("/signin");
-    // };
-
     if (isAuthenticated) {
         return null; // Let the router handle the redirect
     }
