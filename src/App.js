@@ -5,7 +5,7 @@ import {
     Navigate,
 } from "react-router-dom";
 import MobileMenu from "./components/MobileMenu";
-import ChatPage from "./components/ChatPage";
+// import ChatPage from "./components/ChatPage";
 import Profile from "./components/Profile";
 import EditProfile from "./components/ProfileEdit";
 import Connect from "./components/Connect";

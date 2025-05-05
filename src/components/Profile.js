@@ -11,10 +11,6 @@ const Profile = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [isEditing, setIsEditing] = useState(false);
-    const [editedUser, setEditedUser] = useState(null);
-    const [avatarFile, setAvatarFile] = useState(null);
-    const [setUploadProgress] = useState(0);
 
     const fetchUserData = useCallback(
         async (token, userId) => {
@@ -41,7 +37,6 @@ const Profile = () => {
                 }
 
                 setUser(data);
-                setEditedUser(data);
             } catch (err) {
                 console.error("Error fetching profile:", err);
                 setError(
@@ -78,119 +73,6 @@ const Profile = () => {
 
         checkAuth();
     }, [fetchUserData, navigate]);
-
-    const handleAvatarChange = (event) => {
-        const file = event.target.files[0];
-        if (file && file.size <= 5 * 1024 * 1024) {
-            // 5MB limit
-            setAvatarFile(file);
-        } else {
-            alert("File size should be less than 5MB");
-        }
-    };
-
-    const uploadAvatar = async () => {
-        if (!avatarFile) return;
-
-        const formData = new FormData();
-        formData.append("avatar", avatarFile);
-
-        try {
-            const token = localStorage.getItem("token");
-            const response = await fetch(`${API_URL}/users/profile/avatar`, {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-                body: formData,
-            });
-
-            if (!response.ok) {
-                throw new Error("Failed to upload avatar");
-            }
-
-            // Refresh the avatar by forcing a new URL
-            const timestamp = new Date().getTime();
-            setUser((prevUser) => ({
-                ...prevUser,
-                avatarUrl: `${API_URL}/users/profile/avatar?t=${timestamp}`,
-            }));
-
-            setAvatarFile(null);
-            setUploadProgress(0);
-        } catch (error) {
-            console.error("Error uploading avatar:", error);
-            alert("Failed to upload avatar");
-        }
-    };
-
-    const handleEdit = () => {
-        setIsEditing(true);
-    };
-
-    const handleSave = async () => {
-        try {
-            const token = localStorage.getItem("token");
-            const userId = localStorage.getItem("user_id");
-
-            // Prepare the data
-            const profileData = {
-                status: editedUser.status || "Available",
-                phone: editedUser.phone || "",
-                location: editedUser.location || "",
-                bio: editedUser.bio || "",
-            };
-
-            // Handle interests - convert to array if it's a string
-            let interestsArray = [];
-            if (editedUser.interests) {
-                if (typeof editedUser.interests === "string") {
-                    interestsArray = editedUser.interests
-                        .split(",")
-                        .map((interest) => interest.trim());
-                } else if (Array.isArray(editedUser.interests)) {
-                    interestsArray = editedUser.interests;
-                }
-            }
-            profileData.interests = interestsArray;
-
-            console.log("Updating profile with data:", profileData);
-
-            const response = await fetch(`${API_URL}/users/profile/${userId}`, {
-                method: "PUT",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(profileData),
-            });
-
-            console.log("Profile update response status:", response.status);
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(
-                    errorData.message || "Failed to update profile"
-                );
-            }
-
-            const data = await response.json();
-            console.log("Profile update response:", data);
-
-            setUser(data);
-            setIsEditing(false);
-        } catch (err) {
-            console.error("Error updating profile:", err);
-            setError(
-                err.message || "Failed to update profile. Please try again."
-            );
-        }
-    };
-
-    const handleCancel = () => {
-        setEditedUser(user);
-        setIsEditing(false);
-    };
 
     const handleSignOut = async () => {
         try {
