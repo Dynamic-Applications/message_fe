@@ -47,17 +47,6 @@ const Connect = () => {
 
     return (
         <div className="connect-page">
-            <div className="connect-header">
-                <button
-                    className="back-button"
-                    onClick={() => navigate("/")}
-                    style={{ fontSize: "30px" }}
-                >
-                    &lt;
-                </button>
-                <h2>Connect</h2>
-            </div>
-
             <div className="connect-content">
                 <div className="chat-type-toggle">
                     <button

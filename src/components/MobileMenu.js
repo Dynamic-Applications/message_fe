@@ -7,7 +7,7 @@ const MobileMenu = () => {
 
     return (
         <div className="mobile-menu">
-            <button className="menu-item" onClick={() => navigate("/")}>
+            <button className="menu-item" onClick={() => navigate("/messages")}>
                 <i className="fas fa-comment"></i>
                 <span>Messages</span>
             </button>

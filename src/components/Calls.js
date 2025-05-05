@@ -77,7 +77,7 @@ const Calls = () => {
 
     return (
         <div className="calls-page">
-            <div className="calls-header">
+            {/* <div className="calls-header">
                 <button
                     className="back-button"
                     onClick={() => navigate("/")}
@@ -86,7 +86,7 @@ const Calls = () => {
                     &lt;
                 </button>
                 <h2>Calls</h2>
-            </div>
+            </div> */}
 
             <div className="calls-content">
                 <div className="call-tabs">

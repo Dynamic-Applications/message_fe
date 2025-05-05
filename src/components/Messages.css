@@ -4,6 +4,8 @@
     overflow-y: auto;
     font-family: "Poppins", sans-serif;
     padding-bottom: 20px;
+    display: flex;
+    flex-direction: column;
 }
 
 .messages-header {
@@ -124,7 +126,7 @@
 }
 
 /* Responsive Design */
-@media (max-width: 390px) {
+@media (max-width: 401px) {
     .messages-content {
         padding: 15px;
     }

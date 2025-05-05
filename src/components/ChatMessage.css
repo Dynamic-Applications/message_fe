@@ -127,7 +127,7 @@
 }
 
 /* Responsive design */
-@media (max-width: 390px) {
+@media (max-width: 401px) {
     .message-content {
         max-width: 85%;
         padding: 10px 14px;

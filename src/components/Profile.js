@@ -254,16 +254,6 @@ const Profile = () => {
     if (!isAuthenticated) {
         return (
             <div className="profile-page">
-                <div className="profile-header">
-                    <button
-                        className="back-button"
-                        onClick={() => navigate("/")}
-                        style={{ fontSize: "30px" }}
-                    >
-                        &lt;
-                    </button>
-                    <h2>Profile</h2>
-                </div>
                 <div className="profile-content">
                     <div className="not-signed-in">
                         <h3>Please sign in to view your profile</h3>
@@ -282,16 +272,6 @@ const Profile = () => {
     if (error) {
         return (
             <div className="profile-page">
-                <div className="profile-header">
-                    <button
-                        className="back-button"
-                        onClick={() => navigate("/")}
-                        style={{ fontSize: "30px" }}
-                    >
-                        &lt;
-                    </button>
-                    <h2>Profile</h2>
-                </div>
                 <div className="profile-content">
                     <div className="error-message">
                         <h3>Error loading profile</h3>
@@ -310,19 +290,6 @@ const Profile = () => {
 
     return (
         <div className="profile-page">
-            <div className="profile-header">
-                <button
-                    className="back-button"
-                    onClick={() => navigate("/")}
-                    style={{ fontSize: "30px" }}
-                >
-                    &lt;
-                </button>
-                <h2>Profile</h2>
-                <button className="sign-out-button" onClick={handleSignOut}>
-                    Offline
-                </button>
-            </div>
             <div className="profile-content">
                 <div className="profile-avatar-section">
                     <div className="avatar-container">
@@ -341,7 +308,9 @@ const Profile = () => {
                     <h1>{user?.username}</h1>
                     <p className="user-status">{user?.status || "Available"}</p>
                 </div>
-
+                <button className="sign-out-button" onClick={handleSignOut}>
+                    Offline
+                </button>
                 <div className="profile-info-section">
                     <div className="info-group">
                         <h3>Contact Information</h3>
@@ -390,109 +359,12 @@ const Profile = () => {
                         </div>
                     </div>
                 </div>
-
-                {isEditing ? (
-                    <div className="edit-profile-section">
-                        <h3>Edit Profile</h3>
-                        <div className="edit-field">
-                            <label>Profile Picture</label>
-                            <div className="avatar-upload-container">
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleAvatarChange}
-                                    id="avatar-upload"
-                                    className="file-input"
-                                />
-                                {avatarFile && (
-                                    <button
-                                        onClick={uploadAvatar}
-                                        className="upload-button"
-                                    >
-                                        Upload New Avatar
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                        <div className="edit-field">
-                            <label>Phone</label>
-                            <input
-                                type="text"
-                                value={editedUser.phone}
-                                onChange={(e) =>
-                                    setEditedUser({
-                                        ...editedUser,
-                                        phone: e.target.value,
-                                    })
-                                }
-                                placeholder="Phone number"
-                            />
-                        </div>
-                        <div className="edit-field">
-                            <label>Location</label>
-                            <input
-                                type="text"
-                                value={editedUser.location}
-                                onChange={(e) =>
-                                    setEditedUser({
-                                        ...editedUser,
-                                        location: e.target.value,
-                                    })
-                                }
-                                placeholder="Your location"
-                            />
-                        </div>
-                        <div className="edit-field">
-                            <label>Bio</label>
-                            <textarea
-                                value={editedUser.bio}
-                                onChange={(e) =>
-                                    setEditedUser({
-                                        ...editedUser,
-                                        bio: e.target.value,
-                                    })
-                                }
-                                placeholder="Tell us about yourself"
-                                rows="4"
-                            />
-                        </div>
-                        <div className="edit-field">
-                            <label>Interests</label>
-                            <input
-                                type="text"
-                                value={editedUser.interests}
-                                onChange={(e) =>
-                                    setEditedUser({
-                                        ...editedUser,
-                                        interests: e.target.value,
-                                    })
-                                }
-                                placeholder="Enter interests separated by commas"
-                            />
-                        </div>
-                        <div className="edit-buttons">
-                            <button
-                                className="save-button"
-                                onClick={handleSave}
-                            >
-                                Save Changes
-                            </button>
-                            <button
-                                className="cancel-button"
-                                onClick={handleCancel}
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-                ) : (
-                    <button
-                        className="edit-profile-button"
-                        onClick={handleEdit}
-                    >
-                        Edit Profile
-                    </button>
-                )}
+                <button
+                    className="edit-profile-button"
+                    onClick={() => navigate("/profile/edit")}
+                >
+                    Edit Profile
+                </button>
             </div>
         </div>
     );

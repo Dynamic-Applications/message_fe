@@ -28,7 +28,7 @@ export default function SignIn() {
         const token = localStorage.getItem("token");
         if (token) {
             setIsAuthenticated(true);
-            navigate("/home");
+            navigate("/messages");
         }
     }, [navigate]);
 
@@ -65,7 +65,7 @@ export default function SignIn() {
             localStorage.setItem("user_id", data.user.id);
             setIsAuthenticated(true);
 
-            navigate("/home");
+            navigate("/messages");
         } catch (err) {
             console.error("Login error:", err);
             setError(

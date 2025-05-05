@@ -1,22 +1,20 @@
-import React, { useState } from "react";
+import React from "react";
 import {
     createBrowserRouter,
     RouterProvider,
     Navigate,
 } from "react-router-dom";
-import ChatList from "./components/ChatList";
-import ChatMessage from "./components/ChatMessage";
-import MessageInput from "./components/MessageInput";
-import UserAvatar from "./components/UserAvatar";
+import MobileMenu from "./components/MobileMenu";
 import ChatPage from "./components/ChatPage";
 import Profile from "./components/Profile";
+import EditProfile from "./components/ProfileEdit";
 import Connect from "./components/Connect";
 import Calls from "./components/Calls";
-import MobileMenu from "./components/MobileMenu";
 import SignIn from "./components/SignIn";
 import SignUp from "./components/Signup";
 import SignInGoogle from "./components/SignInGoogle";
 import "./App.css";
+import Messages from "./components/Messages";
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
@@ -27,83 +25,16 @@ const ProtectedRoute = ({ children }) => {
     return children;
 };
 
-function AppContent() {
-    const [selectedChat, setSelectedChat] = useState(null);
-    const [messages, setMessages] = useState([
-        {
-            id: 1,
-            text: "Hey, how are you?",
-            time: "10:30 AM",
-            isOwn: false,
-        },
-        {
-            id: 2,
-            text: "I'm good, thanks! How about you?",
-            time: "10:31 AM",
-            isOwn: true,
-        },
-        {
-            id: 3,
-            text: "Doing great! Want to catch up later?",
-            time: "10:32 AM",
-            isOwn: false,
-        },
-    ]);
-
-    const handleSendMessage = (text) => {
-        const newMessage = {
-            id: messages.length + 1,
-            text,
-            time: new Date().toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-            }),
-            isOwn: true,
-        };
-        setMessages([...messages, newMessage]);
-    };
-
+// Layout for protected routes
+const ProtectedLayout = ({ children }) => {
     return (
-        <div className="app">
-            <div className="app-container">
-                <div className="sidebar">
-                    <ChatList onSelectChat={setSelectedChat} />
-                </div>
-                <div className="chat-container">
-                    {selectedChat ? (
-                        <>
-                            <div className="chat-header">
-                                <UserAvatar
-                                    src={selectedChat.avatar}
-                                    alt={selectedChat.name}
-                                    size="medium"
-                                />
-                                <h2>{selectedChat.name}</h2>
-                            </div>
-                            <div className="messages-container">
-                                {messages.map((message) => (
-                                    <ChatMessage
-                                        key={message.id}
-                                        message={message}
-                                        isOwn={message.isOwn}
-                                    />
-                                ))}
-                            </div>
-                            <MessageInput onSendMessage={handleSendMessage} />
-                        </>
-                    ) : (
-                        <div className="no-chat-selected">
-                            <h2>Select a chat to start messaging</h2>
-                        </div>
-                    )}
-                </div>
-            </div>
-            <MobileMenu />
+        <div>
+            {children}
+            <MobileMenu /> {/* MobileMenu is always visible */}
         </div>
     );
-}
+};
 
-// Create router with future flags
 const router = createBrowserRouter(
     [
         {
@@ -123,18 +54,12 @@ const router = createBrowserRouter(
             element: <SignInGoogle />,
         },
         {
-            path: "/home",
+            path: "/messages",
             element: (
                 <ProtectedRoute>
-                    <AppContent />
-                </ProtectedRoute>
-            ),
-        },
-        {
-            path: "/chat/:chatId",
-            element: (
-                <ProtectedRoute>
-                    <ChatPage />
+                    <ProtectedLayout>
+                        <Messages />
+                    </ProtectedLayout>
                 </ProtectedRoute>
             ),
         },
@@ -142,15 +67,30 @@ const router = createBrowserRouter(
             path: "/profile",
             element: (
                 <ProtectedRoute>
-                    <Profile />
+                    <ProtectedLayout>
+                        <Profile />
+                    </ProtectedLayout>
                 </ProtectedRoute>
             ),
         },
         {
+            path: "/profile/edit",
+            element: (
+                <ProtectedRoute>
+                    <ProtectedLayout>
+                        <EditProfile />
+                    </ProtectedLayout>
+                </ProtectedRoute>
+            ),
+        },
+
+        {
             path: "/connect",
             element: (
                 <ProtectedRoute>
-                    <Connect />
+                    <ProtectedLayout>
+                        <Connect />
+                    </ProtectedLayout>
                 </ProtectedRoute>
             ),
         },
@@ -158,7 +98,9 @@ const router = createBrowserRouter(
             path: "/calls",
             element: (
                 <ProtectedRoute>
-                    <Calls />
+                    <ProtectedLayout>
+                        <Calls />
+                    </ProtectedLayout>
                 </ProtectedRoute>
             ),
         },

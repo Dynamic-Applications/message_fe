@@ -61,7 +61,7 @@
 }
 
 /* Hide on desktop */
-@media (min-width: 401px) {
+@media (min-width: 768px) {
     .mobile-menu {
         display: none;
     }

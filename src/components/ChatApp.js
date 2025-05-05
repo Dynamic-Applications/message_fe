@@ -1,114 +1,154 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-    Box,
-    Typography,
-    TextField,
-    IconButton,
-    Paper,
-    Stack,
-} from "@mui/material";
-import SendIcon from "@mui/icons-material/Send";
-import LockIcon from "@mui/icons-material/Lock";
-import { io } from "socket.io-client";
+import { useNavigate } from "react-router-dom";
+import io from "socket.io-client";
 import SwipeToDelete from "./SwipeToDelete";
+import "./ChatApp.css";
 
-const token = localStorage.getItem("token");
-const currentUserId = localStorage.getItem("user_id");
-const API_URL =
-    process.env.REACT_APP_MESSAGE_API || "https://messageapi-z2ao.onrender.com";
-
-const socket = io(`${API_URL}`, {
-    auth: { token },
-});
+const API_URL = "http://localhost:5000";
+const SOCKET_URL = "http://localhost:5000";
 
 const ChatApp = () => {
-    const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([]);
-    const [activity, setActivity] = useState("");
+    const [newMessage, setNewMessage] = useState("");
+    const [selectedUsers, setSelectedUsers] = useState([]);
+    const [isConnected, setIsConnected] = useState(false);
+    const [error, setError] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
     const messagesEndRef = useRef(null);
+    const socketRef = useRef(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchMessages = async () => {
-            try {
-                const response = await fetch(`${API_URL}/messages`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                    },
-                });
+        const token = localStorage.getItem("token");
+        if (!token) {
+            navigate("/signin");
+            return;
+        }
 
-                if (!response.ok) {
-                    throw new Error("Failed to fetch messages");
-                }
+        // Initialize socket connection
+        socketRef.current = io(SOCKET_URL, {
+            auth: {
+                token,
+            },
+            transports: ["websocket"],
+            reconnection: true,
+            reconnectionAttempts: 5,
+            reconnectionDelay: 1000,
+        });
 
-                const data = await response.json();
-                console.log("Fetched messages:", data);
-                setMessages(data);
-            } catch (err) {
-                console.error("Error fetching messages:", err);
-            }
-        };
+        // Socket event listeners
+        socketRef.current.on("connect", () => {
+            console.log("Socket connected");
+            setIsConnected(true);
+            setError(null);
+        });
 
+        socketRef.current.on("connect_error", (error) => {
+            console.error("Socket connection error:", error);
+            setError("Failed to connect to chat server");
+            setIsConnected(false);
+        });
+
+        socketRef.current.on("disconnect", () => {
+            console.log("Socket disconnected");
+            setIsConnected(false);
+        });
+
+        socketRef.current.on("message", (message) => {
+            console.log("Received message:", message);
+            setMessages((prevMessages) => [...prevMessages, message]);
+        });
+
+        // Fetch initial messages
         fetchMessages();
-    }, []);
 
-    useEffect(() => {
-        socket.on("message", (msg) => {
-            setMessages((prev) => [...prev, msg]);
-        });
-
-        socket.on("activity", (name) => {
-            setActivity(name ? `${name} is typing...` : "");
-            if (name) {
-                setTimeout(() => setActivity(""), 3500);
-            }
-        });
-
+        // Cleanup on unmount
         return () => {
-            socket.off("message");
-            socket.off("activity");
-        };
-    }, []);
-
-    useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages]);
-
-    const handleSend = async () => {
-        if (message.trim()) {
-            try {
-                const response = await fetch(`${API_URL}/messages`, {
-                    method: "POST",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ text: message }),
-                });
-
-                if (!response.ok) {
-                    throw new Error("Failed to send message");
-                }
-
-                const newMessage = await response.json();
-                socket.emit("message", newMessage);
-                setMessage("");
-            } catch (err) {
-                console.error("Error sending message:", err);
+            if (socketRef.current) {
+                socketRef.current.disconnect();
             }
+        };
+    }, [navigate]);
+
+    const fetchMessages = async () => {
+        try {
+            const token = localStorage.getItem("token");
+            const response = await fetch(`${API_URL}/api/messages`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch messages");
+            }
+
+            const data = await response.json();
+            console.log("Raw message data:", data);
+            // Ensure each message has the required fields
+            const processedMessages = data.map((msg) => {
+                console.log("Processing message:", msg);
+                return {
+                    ...msg,
+                    sender_id: msg.sender_id || msg.user_id,
+                    sender_username: msg.sender_username || msg.username,
+                };
+            });
+            console.log("Processed messages:", processedMessages);
+            setMessages(processedMessages);
+            setIsLoading(false);
+        } catch (error) {
+            console.error("Error fetching messages:", error);
+            setError("Failed to load messages");
+            setIsLoading(false);
         }
     };
 
-    const handleTyping = () => {
-        socket.emit("activity", "Someone");
+    const handleSendMessage = (e) => {
+        e.preventDefault();
+        if (!newMessage.trim() || !isConnected) return;
+
+        const messageData = {
+            content: newMessage,
+            recipients: selectedUsers.map((user) => user.id),
+        };
+
+        // Emit message through socket
+        socketRef.current.emit("message", messageData, (response) => {
+            if (response.error) {
+                console.error("Error sending message:", response.error);
+                setError("Failed to send message");
+                return;
+            }
+            console.log("Message sent successfully:", response);
+            setMessages((prevMessages) => [...prevMessages, response]);
+        });
+
+        setNewMessage("");
     };
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
+
+    if (isLoading) {
+        return <div className="loading">Loading messages...</div>;
+    }
+
+    if (error) {
+        return <div className="error-message">{error}</div>;
+    }
 
     const handleDelete = async (id) => {
         try {
             const response = await fetch(`${API_URL}/messages/${id}`, {
                 method: "DELETE",
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
                     "Content-Type": "application/json",
                 },
             });
@@ -129,7 +169,7 @@ const ChatApp = () => {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
                 body: JSON.stringify({ text: newMessage }),
             });
@@ -168,43 +208,70 @@ const ChatApp = () => {
         return groups;
     }, {});
 
-    return (
-        <div className="chat-container" style={{ padding: "20px" }}>
-            {Object.keys(groupedMessages).map((dateLabel) => (
-                <div key={dateLabel}>
-                    <h3>{dateLabel}</h3>
-                    <SwipeToDelete
-                        rows={groupedMessages[dateLabel].map((msg) => ({
-                            id: msg.id,
-                            title: msg.text,
-                        }))}
-                        onDelete={handleDelete}
-                        onEdit={(id) => {
-                            const newText = prompt("Edit your message:");
-                            if (newText) {
-                                handleEdit(id, newText);
-                            }
-                        }}
-                    />
-                </div>
-            ))}
+    const handleUsernameClick = () => {
+        const chatId = "1"; // Hardcoded ID for testing
+        console.log("Navigating to chat ID:", chatId);
+        navigate(`/chat/${chatId}`);
+    };
 
-            <div style={{ marginTop: "20px" }}>
-                <input
-                    type="text"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    onKeyDown={handleTyping}
-                    placeholder="Type your message..."
-                    style={{ width: "80%", padding: "10px" }}
-                />
-                <button onClick={handleSend} style={{ padding: "10px" }}>
-                    Send
-                </button>
-                <div>{activity}</div>
+    const renderMessage = (msg) => (
+        <div
+            key={msg.id}
+            className={`message ${msg.is_sent ? "sent" : "received"}`}
+        >
+            <div className="message-header">
+                <span
+                    className="message-sender"
+                    onClick={handleUsernameClick}
+                    style={{ cursor: "pointer", textDecoration: "underline" }}
+                >
+                    {msg.sender_username || msg.username}
+                </span>
+                <span className="message-time">
+                    {new Date(msg.created_at).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    })}
+                </span>
+            </div>
+            <div className="message-content">{msg.text || msg.content}</div>
+        </div>
+    );
+
+    return (
+        <div className="chat-app">
+            <div className="chat-header">
+                <h2>Chat</h2>
+                {!isConnected && (
+                    <div className="connection-status">Reconnecting...</div>
+                )}
             </div>
 
-            <div ref={messagesEndRef} />
+            <div className="messages-container">
+                {Object.keys(groupedMessages).map((dateLabel) => (
+                    <div key={dateLabel} className="message-group">
+                        <h3>{dateLabel}</h3>
+                        {groupedMessages[dateLabel].map(renderMessage)}
+                    </div>
+                ))}
+                <div ref={messagesEndRef} />
+            </div>
+
+            <form onSubmit={handleSendMessage} className="message-input-form">
+                <input
+                    type="text"
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    placeholder="Type a message..."
+                    disabled={!isConnected}
+                />
+                <button
+                    type="submit"
+                    disabled={!isConnected || !newMessage.trim()}
+                >
+                    Send
+                </button>
+            </form>
         </div>
     );
 };

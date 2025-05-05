@@ -75,16 +75,6 @@ const Messages = () => {
 
     return (
         <div className="messages-page">
-            <div className="messages-header">
-                <button
-                    className="back-button"
-                    onClick={() => navigate("/")}
-                    style={{ fontSize: "30px" }}
-                >
-                    &lt;
-                </button>
-                <h2>Messages</h2>
-            </div>
             <div className="messages-content">
                 {messages.length === 0 ? (
                     <div className="no-messages">
