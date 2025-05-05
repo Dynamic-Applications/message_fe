@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import io from "socket.io-client";
-import SwipeToDelete from "./SwipeToDelete";
+// import SwipeToDelete from "./SwipeToDelete";
 import "./ChatApp.css";
 
 const API_URL = "http://localhost:5000";
@@ -10,7 +10,7 @@ const SOCKET_URL = "http://localhost:5000";
 const ChatApp = () => {
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
-    const [selectedUsers, setSelectedUsers] = useState([]);
+    const [selectedUsers] = useState([]);
     const [isConnected, setIsConnected] = useState(false);
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -143,51 +143,51 @@ const ChatApp = () => {
         return <div className="error-message">{error}</div>;
     }
 
-    const handleDelete = async (id) => {
-        try {
-            const response = await fetch(`${API_URL}/messages/${id}`, {
-                method: "DELETE",
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    "Content-Type": "application/json",
-                },
-            });
+    // const handleDelete = async (id) => {
+    //     try {
+    //         const response = await fetch(`${API_URL}/messages/${id}`, {
+    //             method: "DELETE",
+    //             headers: {
+    //                 Authorization: `Bearer ${localStorage.getItem("token")}`,
+    //                 "Content-Type": "application/json",
+    //             },
+    //         });
 
-            if (!response.ok) {
-                throw new Error("Failed to delete message");
-            }
+    //         if (!response.ok) {
+    //             throw new Error("Failed to delete message");
+    //         }
 
-            setMessages((prev) => prev.filter((msg) => msg.id !== id));
-        } catch (err) {
-            console.error("Delete failed:", err);
-        }
-    };
+    //         setMessages((prev) => prev.filter((msg) => msg.id !== id));
+    //     } catch (err) {
+    //         console.error("Delete failed:", err);
+    //     }
+    // };
 
-    const handleEdit = async (id, newMessage) => {
-        try {
-            const response = await fetch(`${API_URL}/messages/${id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                },
-                body: JSON.stringify({ text: newMessage }),
-            });
+    // const handleEdit = async (id, newMessage) => {
+    //     try {
+    //         const response = await fetch(`${API_URL}/messages/${id}`, {
+    //             method: "PUT",
+    //             headers: {
+    //                 "Content-Type": "application/json",
+    //                 Authorization: `Bearer ${localStorage.getItem("token")}`,
+    //             },
+    //             body: JSON.stringify({ text: newMessage }),
+    //         });
 
-            if (!response.ok) {
-                throw new Error("Failed to edit message");
-            }
+    //         if (!response.ok) {
+    //             throw new Error("Failed to edit message");
+    //         }
 
-            const updatedMessage = await response.json();
-            setMessages((prev) =>
-                prev.map((msg) =>
-                    msg.id === id ? { ...msg, text: updatedMessage.text } : msg
-                )
-            );
-        } catch (err) {
-            console.error("Edit failed:", err);
-        }
-    };
+    //         const updatedMessage = await response.json();
+    //         setMessages((prev) =>
+    //             prev.map((msg) =>
+    //                 msg.id === id ? { ...msg, text: updatedMessage.text } : msg
+    //             )
+    //         );
+    //     } catch (err) {
+    //         console.error("Edit failed:", err);
+    //     }
+    // };
 
     const getDateLabel = (dateStr) => {
         const msgDate = new Date(dateStr);

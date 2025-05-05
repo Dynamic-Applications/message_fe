@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import "./Calls.css";
 
 const Calls = () => {
-    const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("all"); // all, missed, outgoing, incoming
 
     // Mock call history data - in a real app, this would come from an API
@@ -77,17 +75,6 @@ const Calls = () => {
 
     return (
         <div className="calls-page">
-            {/* <div className="calls-header">
-                <button
-                    className="back-button"
-                    onClick={() => navigate("/")}
-                    style={{ fontSize: "30px" }}
-                >
-                    &lt;
-                </button>
-                <h2>Calls</h2>
-            </div> */}
-
             <div className="calls-content">
                 <div className="call-tabs">
                     <button
