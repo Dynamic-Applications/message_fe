@@ -54,6 +54,7 @@
 
 .menu-item.active {
     color: #007aff;
+    transform: translateY(-2px);
 }
 
 .menu-item.active i {
