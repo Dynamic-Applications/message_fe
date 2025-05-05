@@ -4,8 +4,8 @@ import io from "socket.io-client";
 // import SwipeToDelete from "./SwipeToDelete";
 import "./ChatApp.css";
 
-const API_URL = "http://localhost:5000";
-const SOCKET_URL = "http://localhost:5000";
+const API_URL = process.env.REACT_APP_MESSAGE_API || "https://messageapi-z2ao.onrender.com";
+const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || "https://messageapi-z2ao.onrender.com";
 
 const ChatApp = () => {
     const [messages, setMessages] = useState([]);
@@ -73,7 +73,7 @@ const ChatApp = () => {
     const fetchMessages = async () => {
         try {
             const token = localStorage.getItem("token");
-            const response = await fetch(`${API_URL}/api/messages`, {
+            const response = await fetch(`${API_URL}/messages`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

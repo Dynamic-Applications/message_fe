@@ -30,7 +30,7 @@ const ProtectedLayout = ({ children }) => {
     return (
         <div>
             {children}
-            <MobileMenu /> {/* MobileMenu is always visible */}
+            <MobileMenu />
         </div>
     );
 };
