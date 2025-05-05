@@ -77,9 +77,9 @@ export default function SignIn() {
         }
     };
 
-    const googleSignIn = () => {
-        window.location.href = `${API_URL}/auth/google`;
-    };
+    // const googleSignIn = () => {
+    //     window.location.href = `${API_URL}/auth/google`;
+    // };
 
     if (isAuthenticated) {
         return null; // Let the router handle the redirect
@@ -130,7 +130,7 @@ export default function SignIn() {
                         >
                             Sign in with Email
                         </Button>
-                        <Button
+                        {/* <Button
                             variant="contained"
                             color="secondary"
                             fullWidth
@@ -138,7 +138,7 @@ export default function SignIn() {
                             sx={{ mt: 2 }}
                         >
                             Sign in with Google
-                        </Button>
+                        </Button> */}
                     </>
                 )}
 

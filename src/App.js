@@ -20,7 +20,7 @@ import Messages from "./components/Messages";
 const ProtectedRoute = ({ children }) => {
     const token = localStorage.getItem("token");
     if (!token) {
-        return <Navigate to="/signin" replace />;
+        return <Navigate to="/signin"/>;
     }
     return children;
 };
@@ -39,7 +39,7 @@ const router = createBrowserRouter(
     [
         {
             path: "/",
-            element: <Navigate to="/signin" replace />,
+            element: <Navigate to="/signin"/>,
         },
         {
             path: "/signin",
