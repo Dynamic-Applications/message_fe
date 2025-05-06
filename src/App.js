@@ -14,7 +14,9 @@ import SignIn from "./components/SignIn";
 import SignUp from "./components/Signup";
 import SignInGoogle from "./components/SignInGoogle";
 import "./App.css";
-import Messages from "./components/Messages";
+// import Messages from "./components/Messages";
+import UsersList from "./components/Users";
+import UsersProfile from "./components/UsersProfile";
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
@@ -58,7 +60,7 @@ const router = createBrowserRouter(
             element: (
                 <ProtectedRoute>
                     <ProtectedLayout>
-                        <Messages />
+                        <UsersList />
                     </ProtectedLayout>
                 </ProtectedRoute>
             ),
@@ -79,6 +81,16 @@ const router = createBrowserRouter(
                 <ProtectedRoute>
                     <ProtectedLayout>
                         <EditProfile />
+                    </ProtectedLayout>
+                </ProtectedRoute>
+            ),
+        },
+        {
+            path: "/profile/:id",
+            element: (
+                <ProtectedRoute>
+                    <ProtectedLayout>
+                        <UsersProfile/>
                     </ProtectedLayout>
                 </ProtectedRoute>
             ),
