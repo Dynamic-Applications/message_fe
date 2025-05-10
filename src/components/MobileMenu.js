@@ -33,21 +33,21 @@ const MobileMenu = () => {
             </button>
             <button
                 className={`menu-item ${
-                    activeMenu === "/calls" ? "active" : ""
+                    activeMenu === "/profiles" ? "active" : ""
                 }`}
-                onClick={() => handleMenuClick("/calls")}
+                onClick={() => handleMenuClick("/profiles")}
             >
-                <i className="fas fa-phone"></i>
-                <span>Calls</span>
+                <i className="fas fa-users"></i>
+                <span>Users Profile</span>
             </button>
             <button
                 className={`menu-item ${
-                    activeMenu === "/profile" ? "active" : ""
+                    activeMenu === "/account" ? "active" : ""
                 }`}
-                onClick={() => handleMenuClick("/profile")}
+                onClick={() => handleMenuClick("/account")}
             >
                 <i className="fas fa-user"></i>
-                <span>Profile</span>
+                <span>Account</span>
             </button>
         </div>
     );

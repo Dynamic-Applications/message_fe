@@ -1,37 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Connect.css";
 
-const Connect = () => {
+const API_URL =
+    process.env.REACT_APP_MESSAGE_API || "https://messageapi-z2ao.onrender.com";
+
+const Connect = ({ onStartChat = () => {} }) => {
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [isGroupChat, setIsGroupChat] = useState(false);
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    // Mock suggested users - in a real app, this would come from an API
-    const suggestedUsers = [
-        {
-            id: 1,
-            name: "John Doe",
-            avatar: "https://static.vecteezy.com/system/resources/previews/026/958/482/non_2x/profile-icon-simple-flat-style-person-people-user-avatar-pictogram-message-office-business-man-concept-illustration-isolated-on-white-background-eps-10-vector.jpg",
-            status: "Available",
-        },
-        {
-            id: 2,
-            name: "Jane Smith",
-            avatar: "https://static.vecteezy.com/system/resources/previews/026/958/482/non_2x/profile-icon-simple-flat-style-person-people-user-avatar-pictogram-message-office-business-man-concept-illustration-isolated-on-white-background-eps-10-vector.jpg",
-            status: "Busy",
-        },
-        {
-            id: 3,
-            name: "Mike Johnson",
-            avatar: "https://static.vecteezy.com/system/resources/previews/026/958/482/non_2x/profile-icon-simple-flat-style-person-people-user-avatar-pictogram-message-office-business-man-concept-illustration-isolated-on-white-background-eps-10-vector.jpg",
-            status: "Available",
-        },
-    ];
+    useEffect(() => {
+        // Fetch users from the API
+        fetch(`${API_URL}/users`)
+            .then((res) => res.json())
+            .then((data) => {
+                console.log(data); // Log the fetched data to debug
+                setUsers(data); // Store the fetched users
+                setLoading(false); // Set loading to false when data is fetched
+            })
+            .catch((err) => {
+                setError("Failed to fetch users");
+                setLoading(false); // Stop loading even if there's an error
+            });
+    }, []);
 
     const handleUserSelect = (user) => {
-        if (selectedUsers.find((u) => u.id === user.id)) {
+        const exists = selectedUsers.find((u) => u.id === user.id);
+        if (exists) {
             setSelectedUsers(selectedUsers.filter((u) => u.id !== user.id));
         } else {
             setSelectedUsers([...selectedUsers, user]);
@@ -40,10 +40,17 @@ const Connect = () => {
 
     const handleStartChat = () => {
         if (selectedUsers.length > 0) {
-            // In a real app, this would create a new chat and navigate to it
-            navigate("/");
+            onStartChat(selectedUsers); // ✅ Send selected users to parent
+            navigate("/"); // Or redirect to the chat page if needed
         }
     };
+
+    // Filter users based on the search query while ensuring that username exists and can be safely used
+    const filteredUsers = users.filter(
+        (user) =>
+            user?.username &&
+            user.username.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     return (
         <div className="connect-page">
@@ -80,8 +87,15 @@ const Connect = () => {
                 <div className="selected-users">
                     {selectedUsers.map((user) => (
                         <div key={user.id} className="selected-user">
-                            <img src={user.avatar} alt={user.name} />
-                            <span>{user.name}</span>
+                            <img
+                                src={
+                                    user.avatar ||
+                                    "https://static.vecteezy.com/system/resources/previews/026/958/482/non_2x/profile-icon-simple-flat-style-person-people-user-avatar-pictogram-message-office-business-man-concept-illustration-isolated-on-white-background-eps-10-vector.jpg"
+                                } // Handle missing avatar
+                                alt={user.username}
+                                className="user-avatar"
+                            />
+                            <span>{user.username}</span>
                             <button onClick={() => handleUserSelect(user)}>
                                 ×
                             </button>
@@ -91,27 +105,37 @@ const Connect = () => {
 
                 <div className="suggested-users">
                     <h3>Suggested Users</h3>
-                    {suggestedUsers.map((user) => (
-                        <div
-                            key={user.id}
-                            className={`user-item ${
-                                selectedUsers.find((u) => u.id === user.id)
-                                    ? "selected"
-                                    : ""
-                            }`}
-                            onClick={() => handleUserSelect(user)}
-                        >
-                            <img src={user.avatar} alt={user.name} />
-                            <div className="user-info">
-                                <h4>{user.name}</h4>
-                                <span
-                                    className={`status ${user.status.toLowerCase()}`}
-                                >
-                                    {user.status}
-                                </span>
+                    {loading && <p>Loading users...</p>}
+                    {error && <p className="error">{error}</p>}
+                    {!loading && !error && filteredUsers.length === 0 && (
+                        <p>No users found.</p>
+                    )}
+                    {!loading &&
+                        !error &&
+                        filteredUsers.map((user) => (
+                            <div
+                                key={user.id}
+                                className={`user-item ${
+                                    selectedUsers.find((u) => u.id === user.id)
+                                        ? "selected"
+                                        : ""
+                                }`}
+                                onClick={() => handleUserSelect(user)}
+                            >
+                                <img
+                                    src={
+                                        user.avatar ||
+                                        "https://static.vecteezy.com/system/resources/previews/026/958/482/non_2x/profile-icon-simple-flat-style-person-people-user-avatar-pictogram-message-office-business-man-concept-illustration-isolated-on-white-background-eps-10-vector.jpg"
+                                    } // Handle missing avatar
+                                    alt={`${user.username}'s avatar`}
+                                    className="user-avatar"
+                                    onError={(e) =>
+                                        (e.target.style.display = "none")
+                                    }
+                                />
+                                <span>{user.username}</span>
                             </div>
-                        </div>
-                    ))}
+                        ))}
                 </div>
 
                 <button
@@ -119,7 +143,7 @@ const Connect = () => {
                     onClick={handleStartChat}
                     disabled={selectedUsers.length === 0}
                 >
-                    Start {isGroupChat ? "Group" : "Private"} Chat
+                    Send Request
                 </button>
             </div>
         </div>

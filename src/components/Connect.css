@@ -6,8 +6,8 @@
     overflow-y: auto;
     font-family: "Poppins", sans-serif;
     padding-bottom: 20px;
-    display: flex;
-    flex-direction: column;
+    /* display: flex; */
+    /* flex-direction: column; */
 }
 
 .connect-header {
@@ -186,7 +186,7 @@
 
 .selected-user button:hover {
     color: #0056b3;
-    transform: scale(1.1);
+    transform: scale(2);
 }
 
 .suggested-users {

@@ -28,7 +28,7 @@ const Profile = () => {
 
                 console.log("Profile response status:", response.status);
                 const data = await response.json();
-                console.log("Profile data:", data);
+                // console.log("Profile data:", data);
 
                 if (!response.ok) {
                     throw new Error(

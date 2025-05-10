@@ -17,6 +17,7 @@ import "./App.css";
 // import Messages from "./components/Messages";
 import UsersList from "./components/Users";
 import UsersProfile from "./components/UsersProfile";
+import ChatList from "./components/ChatList";
 
 // Protected Route component
 const ProtectedRoute = ({ children }) => {
@@ -41,7 +42,7 @@ const router = createBrowserRouter(
     [
         {
             path: "/",
-            element: <Navigate to="/signin"/>,
+            element: <Navigate to="/signin" />,
         },
         {
             path: "/signin",
@@ -60,13 +61,13 @@ const router = createBrowserRouter(
             element: (
                 <ProtectedRoute>
                     <ProtectedLayout>
-                        <UsersList />
+                        <ChatList />
                     </ProtectedLayout>
                 </ProtectedRoute>
             ),
         },
         {
-            path: "/profile",
+            path: "/account",
             element: (
                 <ProtectedRoute>
                     <ProtectedLayout>
@@ -76,7 +77,7 @@ const router = createBrowserRouter(
             ),
         },
         {
-            path: "/profile/edit",
+            path: "/account/edit",
             element: (
                 <ProtectedRoute>
                     <ProtectedLayout>
@@ -90,7 +91,7 @@ const router = createBrowserRouter(
             element: (
                 <ProtectedRoute>
                     <ProtectedLayout>
-                        <UsersProfile/>
+                        <UsersProfile />
                     </ProtectedLayout>
                 </ProtectedRoute>
             ),
@@ -107,11 +108,11 @@ const router = createBrowserRouter(
             ),
         },
         {
-            path: "/calls",
+            path: "/profiles",
             element: (
                 <ProtectedRoute>
                     <ProtectedLayout>
-                        <Calls />
+                        <UsersList />
                     </ProtectedLayout>
                 </ProtectedRoute>
             ),
