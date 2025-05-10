@@ -9,7 +9,7 @@ import MobileMenu from "./components/MobileMenu";
 import Profile from "./components/Profile";
 import EditProfile from "./components/ProfileEdit";
 import Connect from "./components/Connect";
-import Calls from "./components/Calls";
+// import Calls from "./components/Calls";
 import SignIn from "./components/SignIn";
 import SignUp from "./components/Signup";
 import SignInGoogle from "./components/SignInGoogle";
